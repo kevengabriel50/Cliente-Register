@@ -6,4 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./client";
+export * from "./clientStats";
+export * from "./createClientInput";
+export * from "./errorResponse";
 export * from "./healthStatus";

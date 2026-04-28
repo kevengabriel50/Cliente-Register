@@ -14,3 +14,60 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * @summary List all registered clients
+ */
+export const ListClientsResponseItem = zod.object({
+  id: zod.number(),
+  nome: zod.string(),
+  email: zod.string(),
+  telefone: zod.string().describe("Digits only"),
+  cpf: zod.string().describe("11 digits"),
+  createdAt: zod.coerce.date(),
+});
+export const ListClientsResponse = zod.array(ListClientsResponseItem);
+
+/**
+ * @summary Register a new client
+ */
+export const createClientBodyNomeMax = 200;
+
+export const CreateClientBody = zod.object({
+  nome: zod.string().min(1).max(createClientBodyNomeMax),
+  email: zod.string().email(),
+  telefone: zod
+    .string()
+    .min(1)
+    .describe("Phone number, may include formatting; digits will be extracted"),
+  cpf: zod
+    .string()
+    .min(1)
+    .describe("CPF, may include formatting; must contain 11 digits"),
+});
+
+/**
+ * @summary Delete a client
+ */
+export const DeleteClientParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary Aggregate stats about registered clients
+ */
+export const GetClientStatsResponse = zod.object({
+  total: zod.number(),
+  registeredToday: zod.number(),
+  registeredThisWeek: zod.number(),
+  recent: zod.array(
+    zod.object({
+      id: zod.number(),
+      nome: zod.string(),
+      email: zod.string(),
+      telefone: zod.string().describe("Digits only"),
+      cpf: zod.string().describe("11 digits"),
+      createdAt: zod.coerce.date(),
+    }),
+  ),
+});

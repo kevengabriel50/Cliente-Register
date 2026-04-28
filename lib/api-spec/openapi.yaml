@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: clients
+    description: Client registration operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,81 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /clients:
+    get:
+      operationId: listClients
+      tags: [clients]
+      summary: List all registered clients
+      responses:
+        "200":
+          description: List of clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Client"
+    post:
+      operationId: createClient
+      tags: [clients]
+      summary: Register a new client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateClientInput"
+      responses:
+        "201":
+          description: Client created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict (duplicate CPF or email)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /clients/{id}:
+    delete:
+      operationId: deleteClient
+      tags: [clients]
+      summary: Delete a client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /clients/stats:
+    get:
+      operationId: getClientStats
+      tags: [clients]
+      summary: Aggregate stats about registered clients
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientStats"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +110,76 @@ components:
           type: string
       required:
         - status
-
+    Client:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        email:
+          type: string
+        telefone:
+          type: string
+          description: Digits only
+        cpf:
+          type: string
+          description: 11 digits
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - nome
+        - email
+        - telefone
+        - cpf
+        - createdAt
+    CreateClientInput:
+      type: object
+      properties:
+        nome:
+          type: string
+          minLength: 1
+          maxLength: 200
+        email:
+          type: string
+          format: email
+        telefone:
+          type: string
+          description: Phone number, may include formatting; digits will be extracted
+          minLength: 1
+        cpf:
+          type: string
+          description: CPF, may include formatting; must contain 11 digits
+          minLength: 1
+      required:
+        - nome
+        - email
+        - telefone
+        - cpf
+    ErrorResponse:
+      type: object
+      properties:
+        erro:
+          type: string
+      required:
+        - erro
+    ClientStats:
+      type: object
+      properties:
+        total:
+          type: integer
+        registeredToday:
+          type: integer
+        registeredThisWeek:
+          type: integer
+        recent:
+          type: array
+          items:
+            $ref: "#/components/schemas/Client"
+      required:
+        - total
+        - registeredToday
+        - registeredThisWeek
+        - recent

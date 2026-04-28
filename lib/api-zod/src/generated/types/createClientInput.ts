@@ -5,20 +5,6 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-export interface HealthStatus {
-  status: string;
-}
-
-export interface Client {
-  id: number;
-  nome: string;
-  email: string;
-  /** Digits only */
-  telefone: string;
-  /** 11 digits */
-  cpf: string;
-  createdAt: string;
-}
 
 export interface CreateClientInput {
   /**
@@ -37,15 +23,4 @@ export interface CreateClientInput {
    * @minLength 1
    */
   cpf: string;
-}
-
-export interface ErrorResponse {
-  erro: string;
-}
-
-export interface ClientStats {
-  total: number;
-  registeredToday: number;
-  registeredThisWeek: number;
-  recent: Client[];
 }
