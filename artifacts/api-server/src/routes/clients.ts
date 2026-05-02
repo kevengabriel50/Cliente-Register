@@ -31,7 +31,9 @@ router.get("/clients", async (req, res) => {
   res.json(resultado);
 });
 
-router.get("/clients/stats", async (_req, res) => {
+router.get("/clients/stats", async (req, res) => {
+  const role = getRole(req.headers.authorization);
+
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
 
@@ -53,11 +55,16 @@ router.get("/clients/stats", async (_req, res) => {
     .from(clientsTable)
     .where(gte(clientsTable.createdAt, startOfWeek));
 
-  const recent = await db
+  const recentRows = await db
     .select()
     .from(clientsTable)
     .orderBy(desc(clientsTable.createdAt))
     .limit(5);
+
+  const recent = recentRows.map((cliente) => ({
+    ...cliente,
+    cpf: role === "admin" ? cliente.cpf : "***.***.***-**",
+  }));
 
   res.json({
     total: totalRow?.count ?? 0,
