@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Users, Home, Plus, LogOut, ShieldCheck } from "lucide-react";
+import { Users, Home, Plus, LogOut, ShieldCheck, UserCog } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { href: "/", label: "Visão Geral", icon: Home },
     { href: "/clientes", label: "Clientes", icon: Users },
     { href: "/cadastrar", label: "Cadastrar", icon: Plus },
+    ...(isAdmin
+      ? [{ href: "/usuarios", label: "Usuários", icon: UserCog }]
+      : []),
   ];
 
   return (

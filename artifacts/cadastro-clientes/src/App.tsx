@@ -8,16 +8,21 @@ import Dashboard from "@/pages/dashboard";
 import Clientes from "@/pages/clientes";
 import CadastrarCliente from "@/pages/cadastrar";
 import Login from "@/pages/login";
+import Usuarios from "@/pages/usuarios";
 import { AuthProvider, useAuth } from "@/context/auth";
 
 const queryClient = new QueryClient();
 
-function RotaProtegida({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
+function RotaProtegida({ children, apenasAdmin }: { children: React.ReactNode; apenasAdmin?: boolean }) {
+  const { isAuthenticated, isAdmin } = useAuth();
   const [location] = useLocation();
 
   if (!isAuthenticated) {
     return <Redirect to={`/login?redirect=${encodeURIComponent(location)}`} />;
+  }
+
+  if (apenasAdmin && !isAdmin) {
+    return <Redirect to="/" />;
   }
 
   return <Layout>{children}</Layout>;
@@ -40,6 +45,11 @@ function Router() {
       <Route path="/cadastrar">
         <RotaProtegida>
           <CadastrarCliente />
+        </RotaProtegida>
+      </Route>
+      <Route path="/usuarios">
+        <RotaProtegida apenasAdmin>
+          <Usuarios />
         </RotaProtegida>
       </Route>
       <Route component={NotFound} />
