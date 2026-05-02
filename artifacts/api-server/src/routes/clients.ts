@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { db, clientsTable } from "@workspace/db";
 import { CreateClientBody, DeleteClientParams } from "@workspace/api-zod";
 import { desc, eq, gte, sql } from "drizzle-orm";
+import { obterSessao } from "../lib/sessions";
 
 const router: IRouter = Router();
 
@@ -9,12 +10,25 @@ function digitsOnly(value: string): string {
   return value.replace(/\D/g, "");
 }
 
-router.get("/clients", async (_req, res) => {
+function getRole(authHeader: string | undefined): string {
+  const token = (authHeader ?? "").replace("Bearer ", "");
+  return obterSessao(token)?.role ?? "visitante";
+}
+
+router.get("/clients", async (req, res) => {
+  const role = getRole(req.headers.authorization);
+
   const rows = await db
     .select()
     .from(clientsTable)
     .orderBy(desc(clientsTable.createdAt));
-  res.json(rows);
+
+  const resultado = rows.map((cliente) => ({
+    ...cliente,
+    cpf: role === "admin" ? cliente.cpf : "***.***.***-**",
+  }));
+
+  res.json(resultado);
 });
 
 router.get("/clients/stats", async (_req, res) => {
