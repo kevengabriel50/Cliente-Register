@@ -1,0 +1,82 @@
+dados = []
+usuario = {
+    "nome": "admin",
+    "senha": "123",
+    "role": "admin"
+}
+
+usuario_logado = None
+
+def login():
+    global usuario_logado
+    
+    nome = input("Digite seu nome: ").strip()
+    senha = input("Digite sua senha: ").strip() 
+    
+    if nome == usuario["nome"] and senha == usuario["senha"]:
+        usuario_logado = usuario
+        print("Login realizado com sucesso\n")
+    else:
+        print("Login inválido\n") 
+
+def cadastrar():   
+    
+    nome = input("Digite seu nome: ").strip()
+    email = input("Digite seu email: ").strip()
+    telefone = ''.join(filter(str.isdigit, input("Digite seu telefone: ")))
+    if not usuario_logado:
+            print("Você precisa fazer login primeiro!\n")
+            return
+    
+    while True:
+      cpf = ''.join(filter(str.isdigit, input("Digite seu CPF: ")))
+      if len(cpf) != 11:
+          print("CPF inválido")
+      else:
+          break
+    
+    clientes = {
+        "Nome": nome,
+        "Email": email,
+        "Telefone": telefone,
+        "CPF": cpf
+    } 
+    
+    dados.append(clientes)
+    print("Cadastro realizado com sucesso") 
+
+def listar_clientes():
+    if not dados:
+        print("Nenhum cliente cadastrado.\n")
+        return
+
+    for cliente in dados:
+        cliente_copia = cliente.copy()
+
+        # se não for admin, esconde CPF
+        if not usuario_logado or usuario_logado["role"] != "admin":
+            cliente_copia["CPF"] = "***********"
+
+        print(cliente_copia)
+    print()
+
+while True:
+    print("Escolha uma opção:")
+    print("1. Login")
+    print("2. Cadastrar")
+    print("3. Listar Clientes")
+    print("4. Sair") 
+
+    opcao = input("Escolha :").strip()
+
+    if opcao == "1":
+        login() 
+    elif opcao == "2":
+        cadastrar()
+    elif opcao == "3":
+        listar_clientes()
+    elif opcao == "4":
+        print("Saindo do programa...")
+        break
+    else:
+        print("Opção inválida. Por favor, tente novamente.")
