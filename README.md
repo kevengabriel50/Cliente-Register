@@ -82,4 +82,4 @@ Ideias de melhorias que pretendo explorar:
 
 ## Autor
 
-**Kevin Gabriel** — [@kevengabriel150](https://github.com/kevengabriel150)
+**Keven Gabriel** — [@kevengabriel150](https://github.com/kevengabriel150)
